@@ -1,0 +1,49 @@
+# ---------------------------------------------------------------------------
+# "OrdererOrgs" - Definition of organizations managing orderer nodes
+# ---------------------------------------------------------------------------
+OrdererOrgs:
+
+  # ---------------------------------------------------------------------------
+  # Orderer
+  # ---------------------------------------------------------------------------
+  - Name: Orderer
+    Domain: twoorg.com
+    Specs:
+      - Hostname: orderer
+
+# ---------------------------------------------------------------------------
+# "PeerOrgs" - Definition of organizations managing peer nodes
+# ---------------------------------------------------------------------------
+PeerOrgs:
+
+  # ---------------------------------------------------------------------------
+  # Org1
+  # ---------------------------------------------------------------------------
+  - Name: Org1
+    Domain: Org1.twoorg.com
+    EnableNodeOUs: true
+    CA:
+       Hostname: ca # implicitly ca.org1.twoorg.com
+
+    Template:
+      Count: 1
+      SANS:
+        - "localhost"
+    Users:
+      Count: 1
+
+  # ---------------------------------------------------------------------------
+  # Insurer2
+  # ---------------------------------------------------------------------------
+  - Name: Org2
+    Domain: Org2.twoorg.com
+    EnableNodeOUs: true
+    CA:
+       Hostname: ca # implicitly ca.insurer2.twoorg.com
+
+    Template:
+      Count: 1
+      SANS:
+        - "localhost"
+    Users:
+      Count: 1

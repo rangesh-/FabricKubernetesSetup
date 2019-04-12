@@ -1,0 +1,92 @@
+
+---
+######################### Organizations #################################
+
+Organizations:
+
+    - &OrdererOrg
+        Name: OrdererMSP
+        ID: OrdererMSP
+        MSPDir: ../crypto/crypto-config/ordererOrganizations/twoorg.com/msp
+
+    - &Org1
+        Name: Org1MSP
+        ID: Org1MSP
+        MSPDir: ../crypto/crypto-config/peerOrganizations/Org1.twoorg.com/msp
+        AnchorPeers:
+            - Host: peer0.Org1.twoorg
+              Port: 7051
+
+    - &Org2
+        Name: Org2MSP
+        ID: Org2MSP
+        MSPDir: ../crypto/crypto-config/peerOrganizations/Org2.twoorg.com/msp
+        AnchorPeers:
+            - Host: peer0.Org2.twoorg
+              Port: 7051
+
+
+############################## Capabilities ###############################
+
+Capabilities:
+
+    Global: &ChannelCapabilities
+        V1_1: true
+
+    Orderer: &OrdererCapabilities
+        V1_1: true
+
+    Application: &ApplicationCapabilities
+        V1_2: true
+
+############################## Application ###############################
+
+Application: &ApplicationDefaults
+    Organizations:
+
+############################## Orderer ###################################
+
+Orderer: &OrdererDefaults
+    OrdererType: solo
+    Addresses:
+        - 13.71.82.75:32001
+    BatchTimeout: 2s
+    BatchSize:
+        MaxMessageCount: 10
+        AbsoluteMaxBytes: 98 MB
+        PreferredMaxBytes: 512 KB
+
+    Kafka:
+        Brokers:
+            - 127.0.0.1:9092
+
+    Organizations:
+
+############################## Profiles ###################################
+
+Profiles:
+
+    TwoOrgOrdererGenesis:
+        Capabilities:
+            <<: *ChannelCapabilities
+        Orderer:
+            <<: *OrdererDefaults
+            Organizations:
+                - *OrdererOrg
+            Capabilities:
+                <<: *OrdererCapabilities
+        Consortiums:
+            AutoClaimConsortium:
+                Organizations:
+                    - *Org1
+                    - *Org2
+
+    TwoOrgOrgsChannel:
+        Consortium: TwoOrgConsortium
+        Application:
+            <<: *ApplicationDefaults
+            Organizations:
+                - *Org1
+                - *Org2
+            Capabilities:
+                <<: *ApplicationCapabilities
