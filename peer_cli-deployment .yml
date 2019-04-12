@@ -1,0 +1,64 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: cli-org  
+spec:
+  selector:
+    matchLabels:
+      app: cli-org
+  template:
+    metadata:
+      labels:
+        app: cli-org
+    spec:
+      volumes:
+      - name: nfs-volume
+        nfs: 
+        # URL for the NFS server
+         server: 192.71.82.75 # Change this!
+         path: /home/fab/twoorgfabric/artifacts/
+      - name: nfs-volume-chaincode
+        nfs:
+          server: 192.71.82.75 # Change this!
+          path: /home/fab/twoorgfabric/artifacts/chaincode
+          
+      - name: docker-socket
+        hostPath:
+          path: /var/run/docker.sock
+      
+      containers:
+      - args:
+        - /bin/bash
+        env:
+        - name: CORE_CHAINCODE_KEEPALIVE
+          value: "10"
+        - name: CORE_LOGGING_LEVEL
+          value: info
+        - name: CORE_PEER_ADDRESS
+          value: 192.71.82.75:32202
+        - name: CORE_PEER_ID
+          value: cli
+        - name: CORE_PEER_LOCALMSPID
+          value: Org1MSP
+        - name: CORE_PEER_MSPCONFIGPATH
+          value: /home/fab/twoorgfabric/artifacts/crypto/crypto-config/peerOrganizations/Org1.twoorg.com/users/Admin@Org1.twoorg.com/msp
+        - name: CORE_PEER_TLS_ENABLED
+          value: "false"
+        - name: GOPATH
+          value: /opt/gopath
+        - name: CORE_VM_ENDPOINT
+          value: unix:///host/var/run/docker.sock  
+        volumeMounts:
+           - mountPath: "/home/fab/twoorgfabric/artifacts/"
+             name: nfs-volume 
+           - mountPath: "/opt/gopath/src/github.com/chaincode"
+             name: nfs-volume-chaincode
+           - mountPath: "/host/var/run/docker.sock"  
+             name: docker-socket 
+        image: hyperledger/fabric-tools
+        name: cli
+        resources: {}
+        tty: true
+        workingDir: /opt/gopath/src/github.com/hyperledger/fabric/peer
+      restartPolicy: Always
+status: {}

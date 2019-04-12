@@ -1,0 +1,69 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: orderertwoorg
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: orderertwoorg
+  template:
+    metadata:
+      labels:
+        app: orderertwoorg
+    spec:
+      hostname: orderer-twoorg-com
+      volumes:
+      - name: nfs-volume-twoorg
+        nfs: 
+        # URL for the NFS server
+         server: 13.71.82.75 # Change this!
+         path: /home/u1048653/twoorgfabric/         
+      containers:
+      - args:
+        - orderer
+        env:
+            - name: ORDERER_GENERAL_GENESISFILE
+              value: /home/u1048653/twoorgfabric/artifacts/channel/genesis.block
+            - name: ORDERER_GENERAL_GENESISMETHOD
+              value: file
+            - name: ORDERER_GENERAL_LEDGERTYPE
+              value: json
+            - name: ORDERER_GENERAL_LISTENADDRESS
+              value: 0.0.0.0
+            - name: ORDERER_GENERAL_LISTENPORT
+              value: "7050"
+            - name: ORDERER_GENERAL_LOCALMSPDIR
+              value: "/home/u1048653/twoorgfabric/artifacts/crypto/crypto-config/ordererOrganizations/twoorg.com/orderers/orderer.twoorg.com/msp"
+            - name: ORDERER_GENERAL_LOCALMSPID
+              value: OrdererMSP
+            - name: ORDERER_GENERAL_LOGLEVEL
+              value: debug
+            - name: ORDERER_GENERAL_TLS_CERTIFICATE
+              value: /home/u1048653/twoorgfabric/artifacts/crypto/crypto-config/ordererOrganizations/twoorg.com/orderers/orderer.twoorg.com/tls/server.crt
+            - name: ORDERER_GENERAL_TLS_ENABLED
+              value: "false"
+            - name: ORDERER_GENERAL_TLS_PRIVATEKEY
+              value: /home/u1048653/twoorgfabric/artifacts/crypto/crypto-config/ordererOrganizations/twoorg.com/orderers/orderer.twoorg.com/tls/server.key
+            - name: ORDERER_GENERAL_TLS_ROOTCAS
+              value: '[/home/u1048653/twoorgfabric/artifacts/crypto/crypto-config/ordererOrganizations/twoorg.com/orderers/orderer.twoorg.com/tls/ca.crt]'
+              
+        image: hyperledger/fabric-orderer
+        name: orderertwoorg
+        ports:
+         - name: orderer-port
+           containerPort: 7050
+        resources: {}
+        volumeMounts:
+              - mountPath: "/home/u1048653/twoorgfabric/"
+                name: nfs-volume-twoorg
+            # - mountPath: "/home/u1048653/twoorgfabric/artifacts/channel"
+            #   name: orderer-insurance-com-claim0
+            # - mountPath: "/home/u1048653/twoorgfabric/artifacts/crypto/crypto-config/ordererOrganizations/twoorg.com/orderers/orderer.twoorg.com"
+            #   name: orderer-insurance-com-claim1        
+        workingDir: /opt/gopath/src/github.com/hyperledger/fabric/orderer
+      restartPolicy: Always    
+
+      
+
+
